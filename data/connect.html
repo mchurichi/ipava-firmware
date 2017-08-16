@@ -1,0 +1,46 @@
+<!doctype html>
+  <head>
+    <script src='/jquery-3.2.1.min.js'></script>
+  </head>  
+  <body>
+
+    <form>
+      <div>
+        <label>Network</label><br/>
+        <select id="networksList" size="5">
+        </select>
+      </div>
+      <div>
+        <label>Password</label>
+        <input type="password"/ id="password">
+      </div>
+      <div>
+        <button id="connect">Connect</button>
+      </div>
+    </form>
+
+    <script type='text/javascript'>
+      $(function(){
+
+        var devEnvs = ['localhost', '127.0.0.1'];
+        var devEsp = 'http://192.168.0.102';
+        var baseUrl = (devEnvs.indexOf(document.location.hostname) >= 0) ? devEsp : '';
+
+        function getNetworks() {
+          $.get(baseUrl + '/api/wifi/scan', function(response) {
+            var data = response.response;
+            
+            var networksList = $('#networksList');
+
+            var networks = [];
+            data.networks.forEach(function(network) {
+              networksList.append($('<option/>').attr({ value: network.ssid }).text(network.ssid));
+            });
+          });
+        };
+
+        getNetworks();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+  <head>
+    <script src='/jquery-3.2.1.min.js'></script>
+
+      <style>
+        .circle {
+          display: inline-block;
+          border-radius: 50px;
+          width: 12px;
+          height: 12px;
+        }
+
+        .green {
+          background-color: green !important;
+        }
+
+        .red {
+          background-color: red !important;
+        }
+
+        .gray {
+          background-color: gray;
+        }
+      </style>
+  </head>  
+  <body>
+    <div id="loading">
+      Loading...
+    </div>
+    <div id="status">
+      <div>
+        <label>Nivel de agua alcanzado: </label><div id='nivelDeAgua' class='circle gray'></div>
+      </div>
+      <div>
+        <label>Cargando agua: </label><div id='bombaAgua' class='circle gray'></div>
+      </div>
+      <div>
+        <label>Calentando: </label><div id='resistencia' class='circle gray'></div>
+      </div>
+      <div>
+        <label>Temperatura actual: </label><span id='temperaturaActual'>---</span>
+      </div>
+      <div>
+        <label>Temperatura: </label>
+        <input type="number"/>
+        <button id="start">Calentar</button>
+      </div>
+    </div>
+    <script type='text/javascript'>
+      $(function(){
+
+        var baseUrl = 'http://192.168.40.54';
+        $('#loading').hide();
+        $('#status').show();
+
+        function getStatus() {
+          setTimeout(function() {
+            $.get(baseUrl + '/status', function(response) {
+              // var data = JSON.parse(response);
+              var data = response;
+              
+              var nivelDeAgua = $('#nivelDeAgua');
+              var bombaAgua = $('#bombaAgua');
+              var resistencia = $('#resistencia');
+              var temperatura = $('#temperaturaActual');
+
+              nivelDeAgua.removeClass('green red');
+              bombaAgua.removeClass('green red');
+              resistencia.removeClass('green red');
+
+              nivelDeAgua.addClass(data.data.nivelDeAgua ? 'green' : 'red');
+              bombaAgua.addClass(data.data.cargandoAgua ? 'green' : 'red');
+              resistencia.addClass(data.data.calentando ? 'green' : 'red');
+              temperatura.html(data.data.temperatura);
+
+              getStatus();
+            });
+          }, 1000);
+        };
+        
+        getStatus();
+      
+        $('#start').on('click', function() {
+          var data = { temperatura: 80 };
+          $.post(baseUrl + '/start', JSON.stringify(data), function(data) {
+            console.log(data);            
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
