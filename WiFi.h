@@ -1,4 +1,4 @@
-class WiFi {
+/*class WiFi {
   public:
     
   private:
@@ -30,4 +30,4 @@ void setupWifi() {
   }
   Serial.println();
   Serial.println("Connected with IP: " + WiFi.localIP().toString());
-}
+}*/
