@@ -2,18 +2,20 @@
 #include <ESP8266WiFi.h>
 #include "FS.h"
 #include "libraries\\ArduinoJson.h"
+#include "KittleService.h"
+
+#define kittleUpdateDelayInMilliseconds 1000
 
 WebServer::WebServer(String deviceId) : webServer(80) {
   this->deviceId = deviceId;
-}
-
-void WebServer::start() {
   this->setupRoutes();
   this->webServer.begin();
+  initializeKittle();
 }
 
 void WebServer::handle() {
   this->webServer.handleClient();
+  updateKittleStatus();
 }
 
 void WebServer::setupRoutes() {
@@ -21,6 +23,8 @@ void WebServer::setupRoutes() {
   this->webServer.on("/api/status", HTTP_GET, [&]() { this->handleStatus(); });
   this->webServer.on("/api/wifi/scan", HTTP_GET, [&]() { this->handleWifiScan(); });
   this->webServer.on("/api/wifi/status", HTTP_GET, [&]() { this->handleWifiStatus(); });
+  this->webServer.on("/api/beginrequest", HTTP_GET, [&]() { this->beginKittleRequest(); });
+  
   this->webServer.serveStatic("/", SPIFFS, "/");
   this->webServer.onNotFound([&]() { this->handleRootRedirect(); });  
 }
@@ -97,22 +101,28 @@ void WebServer::handleWifiStatus() {
   accessPoint.set("ssid", this->deviceId);
   accessPoint.set("ip", WiFi.softAPIP().toString());
   accessPoint.set("clients", WiFi.softAPgetStationNum());
-  // station.set("subnetMask", WiFi.subnetMask());
-  // station.set("gateway", WiFi.gatewayIP());
-  // station.set("DNS 1", WiFi.dnsIP());
-  // station.set("DNS 2", WiFi.dnsIP(1));
   accessPoint.set("macAddress", String(WiFi.softAPmacAddress().c_str()));
 
   root.printTo(jsonString);
   this->webServer.send(200, "application/json", jsonString);  
 }
 
-// void sendFile(String path) {
-//   File f = SPIFFS.open(path, "r");
-//   if (!f) {
-//     server.send(200, "text/html", "index not found! :(");
-//   } else {
-//     server.streamFile(f, "text/html");
-//   }
-//   f.close();
-// }
+void WebServer::initializeKittle()
+{
+  this->lastKittleUpdateTime = millis();
+  this->kittleSvc = KittleService::getInstance();  
+}
+
+void WebServer::beginKittleRequest()
+{
+  this->kittleSvc->StartClientRequest(80);  
+}
+
+void WebServer::updateKittleStatus()
+{ 
+  if (millis() >= (this->lastKittleUpdateTime + kittleUpdateDelayInMilliseconds)) //If more than a second passed
+  {
+    this->kittleSvc->UpdateClientRequest();
+    this->lastKittleUpdateTime = millis();  
+  }
+}

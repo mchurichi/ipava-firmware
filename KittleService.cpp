@@ -18,7 +18,7 @@ KittleService* KittleService::getInstance()
 
 KittleService::KittleService()
 {
-  waterValve = new RelayControl(13, false);
+  waterValve = new RelayControl(4, false);
   waterHeater = new RelayControl(5, false);
   tempSensor = new ThermistorSensor(0, 10000, 10000, 25, 3950);
   waterLevelSensor = new WaterSensor(13);
@@ -73,7 +73,7 @@ void KittleService::EnsureEnoughWater()
     waterValve->off();
     _currentStep++; //go to next step    
   }
-  else if (!waterValve->isCircuitClosed())
+  else
     waterValve->on();
 }
 

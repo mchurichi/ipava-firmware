@@ -4,24 +4,18 @@
 #include "libraries\\ArduinoJson.h"
 #include "FS.h"
 #include "WebServer.h"
-#include "KittleService.h"
 
-#define kittleUpdateDelayInMilliseconds 1000
-unsigned long lastKittleUpdateTime;
 char hostString[16] = {0};
 const char* ssid = "Galatea";
 const char* password = "betopeque16";
 
 DNSServer dnsServer;
 WebServer* webServer;
-KittleService* kittleSvc;
-
 
 void setup() {
   delay(2000);
   sprintf(hostString, "iPava_%06X", ESP.getChipId());
   webServer = new WebServer(hostString);
-  webServer->start();
 
   Serial.begin(9600);
   Serial.println("Starting...");
@@ -31,7 +25,6 @@ void setup() {
   setupAccessPoint();
   setupFileSystem();
   setupMDNS();
-  initializeKittle();
 }
 
 void loop() {
@@ -43,7 +36,6 @@ void loop() {
   */
   dnsServer.processNextRequest();
   webServer->handle();
-  updateKittleStatus();
 }
 
 void setupFileSystem() {
@@ -94,19 +86,4 @@ void setupMDNS() {
   Serial.println("mDNS responder started");
   MDNS.addService("http", "tcp", 80);
   Serial.println("mDNS service added");
-}
-
-void initializeKittle()
-{
-  lastKittleUpdateTime = millis();
-  kittleSvc = KittleService::getInstance();  
-}
-
-void updateKittleStatus()
-{ 
-  if (millis() >= (lastKittleUpdateTime + kittleUpdateDelayInMilliseconds)) //If more than a second passed
-  {
-    kittleSvc->UpdateClientRequest();
-    lastKittleUpdateTime = millis();  
-  }
 }
