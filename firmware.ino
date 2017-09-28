@@ -6,8 +6,8 @@
 #include "WebServer.h"
 
 char hostString[16] = {0};
-const char* ssid = "Galatea";
-const char* password = "betopeque16";
+const char* ssid = "VelocityParana";
+const char* password = "VeloPar.2k17";
 
 DNSServer dnsServer;
 WebServer* webServer;
@@ -21,8 +21,8 @@ void setup() {
   Serial.println("Starting...");
 
   setupHostname();
-  //setupWifi();
-  setupAccessPoint();
+  setupWifi();
+  //setupAccessPoint();
   setupFileSystem();
   setupMDNS();
 }
@@ -66,7 +66,7 @@ void setupWifi() {
 	WiFi.setAutoReconnect(false);
 
   Serial.printf("Connecting to %s\n", ssid);
-  WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -78,7 +78,7 @@ void setupWifi() {
 }
 
 void setupMDNS() {
-  if (!MDNS.begin(hostString, WiFi.softAPIP())) {
+  if (!MDNS.begin(hostString, WiFi.localIP())) {
     Serial.println("Error setting up MDNS responder!");
     return;
   }

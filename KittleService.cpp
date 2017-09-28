@@ -5,6 +5,8 @@
 #include "KittleService.h"
 #include "Arduino.h"
 
+#define timeoutInMs 300000 //5min
+
 //needed for singleton
 KittleService* KittleService::instance = 0;
 
@@ -30,10 +32,11 @@ KittleService::KittleService()
 bool KittleService::StartClientRequest(short desiredTemp)
 {
   if (_processingARequest)
-    return false; //Means kittle is already processing a request or Kittle hasn't been initialized through InitializeKittle
+    return false; //Means kittle is already processing a request
   else {
     waterValve->off();
     waterHeater->off();
+    _startTime = millis();
     _processingARequest = true;
     _desiredTemp = desiredTemp;
     return true;
@@ -45,6 +48,12 @@ String KittleService::UpdateClientRequest()
   //This method won't do anything unless a request has been started
   if(_processingARequest)
   {
+    if(millis() >= (_startTime + timeoutInMs))
+    {
+      EndClientRequest();
+      return "timed out";
+    }
+    
     LogKittleStatus();
     switch(_currentStep)
     {
@@ -111,6 +120,9 @@ void KittleService::LogKittleStatus()
   Serial.print("Agua Calentandose: ");
   Serial.print(waterHeater->isCircuitClosed());
   Serial.print("\n");
+  /*Serial.print("Tiempo antes del timeout en ms: ");
+  Serial.print(timeoutInMs - (millis() - _startTime));
+  Serial.print("\n");*/
 }
 
 

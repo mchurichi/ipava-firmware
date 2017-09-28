@@ -115,7 +115,17 @@ void WebServer::initializeKittle()
 
 void WebServer::beginKittleRequest()
 {
-  this->kittleSvc->StartClientRequest(80);  
+  int defaultTemp = 80;
+  
+  if (this->webServer.arg("temperature") != ""){     //Parameter found
+    defaultTemp = atoi(this->webServer.arg("temperature").c_str());
+  }
+  
+  bool couldStart = this->kittleSvc->StartClientRequest(defaultTemp);
+  if (couldStart)
+    this->webServer.send(200, "text/plain", "Starting to heat water sucessfully");
+  else
+    this->webServer.send(200, "text/plain", "Cannot start heating, processing another request");
 }
 
 void WebServer::updateKittleStatus()

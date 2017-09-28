@@ -22,6 +22,7 @@ class KittleService
     ThermistorSensor* tempSensor;
     WaterSensor* waterLevelSensor;
     //status stuff
+    unsigned long _startTime;
     bool _processingARequest;
     short _currentStep;
     short _desiredTemp;
