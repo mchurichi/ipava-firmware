@@ -1,6 +1,7 @@
 <!doctype html>
   <head>
-    <script src='/jquery-3.2.1.min.js'></script>
+    <script src="/jquery-3.2.1.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>  
   <body>
     <div id="status">
@@ -8,35 +9,35 @@
         <h2>Station</h2>
         <div>
           <label>Connected:</label>
-          <span id='staConnected'>-</span>
+          <span id="staConnected">-</span>
         </div>
         <div>
           <label>SSID:</label>
-          <span id='staSSID'>-</span>
+          <span id="staSSID">-</span>
         </div>
         <div>
           <label>IP:</label>
-          <span id='staIP'>-</span>
+          <span id="staIP">-</span>
         </div>
         <div>
           <label>Subnet Mask:</label>
-          <span id='staSubnetMask'>-</span>
+          <span id="staSubnetMask">-</span>
         </div>
         <div>
           <label>Gateway:</label>
-          <span id='staGateway'>-</span>
+          <span id="staGateway">-</span>
         </div>
         <div>
           <label>MAC Address:</label>
-          <span id='staMacAddress'>-</span>
+          <span id="staMacAddress">-</span>
         </div>
         <div>
           <label>DNS 1:</label>
-          <span id='staDNS1'>-</span>
+          <span id="staDNS1">-</span>
         </div>
         <div>
           <label>DNS 2:</label>
-          <span id='staDNS2'>-</span>
+          <span id="staDNS2">-</span>
         </div>
 
         <div>
@@ -48,81 +49,46 @@
         <h2>Access Point</h2>
         <div>
           <label>Enabled:</label>
-          <span id='apEnabled'>-</span>
+          <span id="apEnabled">-</span>
         </div>
         <div>
           <label>SSID:</label>
-          <span id='apSSID'></span>
+          <span id="apSSID"></span>
         </div>
         <div>
           <label>IP:</label>
-          <span id='apIP'>-</span>
+          <span id="apIP">-</span>
         </div>
         <!-- <div>
           <label>Subnet Mask:</label>
-          <span id='apSubnetMask'>-</span>
+          <span id="apSubnetMask">-</span>
         </div>
         <div>
           <label>Gateway:</label>
-          <span id='apGateway'>-</span>
+          <span id="apGateway">-</span>
         </div>
         <div> -->
           <label>MAC Address:</label>
-          <span id='apMacAddress'>-</span>
+          <span id="apMacAddress">-</span>
         </div>
         <div>
           <label>Connected clients:</label>
-          <span id='apClients'>-</span>
+          <span id="apClients">-</span>
         </div>
       </div>
 
     </div>
 
-    <script type='text/javascript'>
-      $(function(){
-
-        var devEnvs = ['localhost', '127.0.0.1'];
-        var devEsp = 'http://192.168.0.106';
-        var baseUrl = (devEnvs.indexOf(document.location.hostname) >= 0) ? devEsp : '';
-
-        function getStatus() {
-          $.get(baseUrl + '/api/wifi/status', function(response) {
-            var data = response.response;
-            
-            var staConnected = $('#staConnected');
-            var staSSID = $('#staSSID');
-            var staIP = $('#staIP');
-            var staSubnetMask = $('#staSubnetMask');
-            var staGateway = $('#staGateway');
-            var staMacAddress = $('#staMacAddress');
-            var staDNS1 = $('#staDNS1');
-            var staDNS2 = $('#staDNS2');
-
-            staConnected.html(data.station.connected);
-            staSSID.html(data.station.ssid);
-            staIP.html(data.station.ip);
-            staSubnetMask.html(data.station.subnetMask);
-            staGateway.html(data.station.gateway);
-            staMacAddress.html(data.station.macAddress);
-            staDNS1.html(data.station.dns1);
-            staDNS2.html(data.station.dns2);
-
-            var apEnabled = $('#apEnabled');
-            var apSSID = $('#apSSID');
-            var apIP = $('#apIP');
-            var apMacAddress = $('#apMacAddress');
-            var apClients = $('#apClients');
-
-            apEnabled.html(data.accessPoint.enabled);
-            apSSID.html(data.accessPoint.ssid);
-            apIP.html(data.accessPoint.ip);
-            apMacAddress.html(data.accessPoint.macAddress);
-            apClients.html(data.accessPoint.clients);
-          });
-        };
-
-        getStatus();
-      });
+    <script type="text/javascript" src="/app.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        ipava.wifi.status().always(function(status) {
+          var mapping = {
+            staConnected: '='
+          };
+          inputMap(JSON.parse(status), mapping);
+        });
+      })
     </script>
   </body>
 </html>

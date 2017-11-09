@@ -16,7 +16,6 @@ DNSServer dnsServer;
 WebServer* webServer;
 KittleService* kittleSvc;
 
-
 void setup() {
   delay(2000);
   sprintf(hostString, "iPava_%06X", ESP.getChipId());
